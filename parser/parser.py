@@ -10,6 +10,3 @@ def get_pars():
         additional_settings={"start_page": 1, "end_page": 2},
     )
     return data[0]
-
-
-print(get_pars())

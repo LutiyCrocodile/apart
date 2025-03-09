@@ -1,23 +1,22 @@
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.engine import Result
-from sqlalchemy import select
-from .shemas import Base
-from core.models.items import Items
+import asyncpg
+from core.config import settings
 
 
-async def get_all_items(session: AsyncSession) -> list[Items]:
-    statement = select(Items).order_by(Items.id)
-    result: Result = await session.execute(statement)
-    items = result.scalars().all()
-    return list(items)
+async def read_all(table):
+    try:
+        connection = await asyncpg.connect(dsn=settings.DATABASE_URL)
+        query = f'SELECT {table} FROM {settings.DB_SCHEMA}."{table}"'
+        result = await connection.fetch(query)
+        await connection.close()
+        return result
+    except Exception as e:
+        print(f"[INFO]Error '{e}'")
 
 
-async def get_item(session: AsyncSession, item_id: int) -> Items | None:
-    return await session.get(Items, item_id)
+async def insert_item(table, value):
 
-
-async def create_item(session: AsyncSession, item_in: Base) -> Items:
-    item = Items(**item_in.model_dump())
-    session.add(item)
-    await session.commit()
-    return item
+    connection = await asyncpg.connect(dsn=settings.DATABASE_URL)
+    stmt = f"INSERT INTO {settings.DB_SCHEMA}.{table}({table}) VALUES ({value})"
+    result = await connection.execute(stmt)
+    await connection.close()
+    return result
