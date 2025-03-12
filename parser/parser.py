@@ -1,12 +1,12 @@
 import cianparser
 
 
-def get_pars():
+def get_pars(deal_type: str, rooms: int, additional_settings: dict) -> list[dict]:
     moscow_parser = cianparser.CianParser(location="Москва")
     data = moscow_parser.get_flats(
-        deal_type="sale",
-        rooms=(1, 2),
-        with_saving_csv=True,
-        additional_settings={"start_page": 1, "end_page": 2},
+        deal_type=deal_type,
+        rooms=rooms,
+        with_saving_csv=False,
+        additional_settings=additional_settings,
     )
-    return data[0]
+    return data

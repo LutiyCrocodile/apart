@@ -1,6 +1,9 @@
 from dataclasses import dataclass
 from dotenv import load_dotenv
 import os
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker
 
 load_dotenv()
 
@@ -16,7 +19,11 @@ class Settings:
 
     @property
     def DATABASE_URL(self) -> str:
-        return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 
 settings = Settings()
+
+
+engine = create_async_engine(url=settings.DATABASE_URL)
+connection = sessionmaker(engine, class_=AsyncSession)
